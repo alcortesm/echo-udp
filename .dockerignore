@@ -1,0 +1,13 @@
+CHANGELOG.md
+docker-compose*
+Dockerfile
+.dockerignore
+LICENSE
+Makefile
+README.md
+test-return-value
+
+# editor and developer specific files (sadly docker don't
+# have a global dockerignore file yet).
+**/*.swp
+**/*~
