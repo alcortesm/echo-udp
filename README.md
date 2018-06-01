@@ -1,12 +1,13 @@
 # echo-udp
 
-A command that echoes UDP payloads to the stdout.  It is specially
-designed to be used as a debugging service in docker-compose.
+A command that echoes UDP payloads to the stdout.
+
+It is specially designed to be used as a docker-compose service
+to debug services that send UDP messages.
 
 A PORT environment variable is required, with the port to listen to.
-
-Includes an internal healthcheck and can be gracefully stopped by a
-SIGINT or a SIGTERM.
+It includes an internal healthcheck
+and can be gracefully stopped with SIGTERM or SIGINT.
 
 ## Installation
 
@@ -36,7 +37,7 @@ services:
   sut:
     build: .
     environment:
-      - PORT=8125
+      - PORT=12345
 
   tester:
     image: subfuzion/netcat
@@ -44,6 +45,6 @@ services:
       sut:
         condition: service_healthy
     entrypoint: "/bin/ash"
-    command: "-c 'nc -u -w1 sut 8125 < /etc/alpine-release'"
+    command: "-c 'nc -u -w1 sut 12345 < /etc/alpine-release'"
 ```
 

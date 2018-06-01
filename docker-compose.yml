@@ -4,7 +4,7 @@ services:
   sut:
     build: .
     environment:
-      - PORT=8125
+      - PORT=12345
 
   tester:
     image: subfuzion/netcat
@@ -12,4 +12,4 @@ services:
       sut:
         condition: service_healthy
     entrypoint: "/bin/ash"
-    command: "-c 'nc -u -w1 sut 8125 < /etc/alpine-release'"
+    command: "-c 'nc -u -w1 sut 12345 < /etc/alpine-release'"
