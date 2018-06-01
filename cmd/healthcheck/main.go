@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	echoudp "github.com/alcortesm/echo-udp"
+	echoudp "github.com/alcortesm/echoudp"
 )
 
 const (

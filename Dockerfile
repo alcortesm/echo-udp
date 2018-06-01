@@ -1,6 +1,6 @@
 # Creates a Docker image for running the service.
-ARG name=echo-udp
-ARG src=github.com/alcortesm/echo-udp
+ARG name=echoudp
+ARG src=github.com/alcortesm/echoudp
 ARG bin=/bin/${name}
 ARG healthcheck=/bin/healthcheck
 
@@ -37,11 +37,5 @@ ARG bin
 ARG healthcheck
 
 COPY --from=build ${healthcheck} /bin/healthcheck
-HEALTHCHECK \
-    --interval=100ms \
-    --timeout=100ms \
-    --retries=10 \
-    CMD [ "/bin/healthcheck" ]
-
 COPY --from=build ${bin} /bin/service
 ENTRYPOINT ["/bin/service"]

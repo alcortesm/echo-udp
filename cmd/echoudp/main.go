@@ -9,16 +9,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/alcortesm/echo-udp"
+	"github.com/alcortesm/echoudp"
 )
 
 func main() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
 	log.SetFlags(0)
 	log.SetOutput(new(logger))
-	log.Println("echo-udp started")
+	log.Println("echoudp started")
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		s := <-c
+		log.Printf("signal (%v) caught, terminating...", s)
+		os.Exit(0)
+	}()
 
 	addr, err := echoudp.Addr()
 	if err != nil {
@@ -29,20 +34,13 @@ func main() {
 		log.Fatal("listening: ", err)
 	}
 	log.Printf("listening on %v\n", addr)
+	conn.SetReadBuffer(100 * maxUDPPayload)
 
-	conn.SetReadBuffer(1048576) // use a 1MB buffer
-
-	go func() {
-		s := <-c
-		log.Printf("signal (%v) caught, terminating...", s)
-		os.Exit(0)
-	}()
-
-	var buf [1024]byte
+	var buf [maxUDPPayload]byte
 	for {
 		rlen, _, err := conn.ReadFromUDP(buf[:])
 		if err != nil {
-			log.Fatal("reading: ", err)
+			log.Fatal("reading from UDP socket: ", err)
 		}
 		log.Printf("received: %q\n", string(buf[:rlen]))
 	}
@@ -57,3 +55,6 @@ func (_ logger) Write(b []byte) (int, error) {
 
 // RFC3339 with milliseconds and right 0 padding.
 const format = "2006-01-02T15:04:05.000Z07:00"
+
+// maximum UDP payload size in bytes: 2^16 -1 −8 (UDP header) −20 (IP header)
+const maxUDPPayload = 65507
