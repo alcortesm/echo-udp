@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/alcortesm/echo-udp"
 )
@@ -14,6 +15,10 @@ import (
 func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	log.SetFlags(0)
+	log.SetOutput(new(logger))
+	log.Println("echo-udp started")
 
 	addr, err := echoudp.Addr()
 	if err != nil {
@@ -39,7 +44,16 @@ func main() {
 		if err != nil {
 			log.Fatal("reading: ", err)
 		}
-		fmt.Println(string(buf[:rlen]))
+		log.Printf("received: %q\n", string(buf[:rlen]))
 	}
 	os.Exit(1)
 }
+
+type logger struct{}
+
+func (_ logger) Write(b []byte) (int, error) {
+	return fmt.Print(time.Now().UTC().Format(format) + " " + string(b))
+}
+
+// RFC3339 with milliseconds and right 0 padding.
+const format = "2006-01-02T15:04:05.000Z07:00"
